@@ -1,0 +1,20 @@
+﻿namespace Core.Entities;
+
+public partial class Problem
+{
+    public Guid Id { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public bool? IsDeleted { get; set; }
+
+    public virtual Description? Description { get; set; }
+
+    public virtual ICollection<ProblemCategory> ProblemCategories { get; set; } = new List<ProblemCategory>();
+
+    public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
+
+    public virtual ICollection<Template> Templates { get; set; } = new List<Template>();
+
+    public virtual ICollection<Test> Tests { get; set; } = new List<Test>();
+}
