@@ -1,6 +1,7 @@
+using Application.MappingProfiles;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+
 
 namespace API;
 
@@ -14,6 +15,9 @@ public class Program
         
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("CodeTeasersConnectionString")));
+        
+        
+        builder.Services.AddAutoMapper(typeof(ProblemProfile).Assembly);
 
 
         builder.Services.AddControllers();
