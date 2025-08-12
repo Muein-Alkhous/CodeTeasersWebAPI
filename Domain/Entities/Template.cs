@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities;
 
-public partial class Template
+public partial class Template : BaseEntity
 {
     public Guid Id { get; set; }
 

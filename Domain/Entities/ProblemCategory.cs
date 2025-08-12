@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities;
 
-public partial class ProblemCategory
+public partial class ProblemCategory : BaseEntity
 {
     public Guid Id { get; set; }
 

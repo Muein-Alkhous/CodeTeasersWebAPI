@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities;
 
-public partial class Submission
+public partial class Submission : BaseEntity
 {
     public Guid Id { get; set; }
 

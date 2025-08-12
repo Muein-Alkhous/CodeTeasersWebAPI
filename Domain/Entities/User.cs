@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities;
 
-public partial class User
+public partial class User : BaseEntity
 {
     public Guid Id { get; set; }
 
