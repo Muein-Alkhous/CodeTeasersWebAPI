@@ -2,7 +2,6 @@
 
 public partial class Description : BaseEntity
 {
-    public Guid Id { get; set; }
 
     public string DescriptionPath { get; set; } = null!;
 

@@ -2,7 +2,6 @@
 
 public partial class UserStatus : BaseEntity
 {
-    public Guid Id { get; set; }
 
     public int Points { get; set; }
 

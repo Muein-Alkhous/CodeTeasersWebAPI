@@ -2,7 +2,6 @@
 
 public partial class ProblemCategory : BaseEntity
 {
-    public Guid Id { get; set; }
 
     public Guid CategoryId { get; set; }
 

@@ -2,7 +2,6 @@
 
 public partial class Template : BaseEntity
 {
-    public Guid Id { get; set; }
 
     public Guid ProblemId { get; set; }
 

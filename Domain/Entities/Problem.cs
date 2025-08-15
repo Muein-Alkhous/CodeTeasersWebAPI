@@ -2,11 +2,10 @@
 
 public partial class Problem : BaseEntity
 {
-    public Guid Id { get; set; }
     
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
 
-    public string Difficulty { get; set; }
+    public string Difficulty { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
 
     public bool? IsDeleted { get; set; }

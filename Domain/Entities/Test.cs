@@ -2,7 +2,6 @@
 
 public partial class Test : BaseEntity
 {
-    public Guid Id { get; set; }
 
     public Guid ProblemId { get; set; }
 

@@ -2,7 +2,6 @@
 
 public partial class Submission : BaseEntity
 {
-    public Guid Id { get; set; }
 
     public Guid ProblemId { get; set; }
 

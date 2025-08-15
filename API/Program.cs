@@ -1,6 +1,11 @@
+using Application;
+using Application.Interfaces.Authentication;
 using Application.MappingProfiles;
+using Application.Services.Authentication;
+using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 
 namespace API;
@@ -15,6 +20,10 @@ public class Program
         
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("CodeTeasersConnectionString")));
+
+        builder.Services
+            .AddApplication()
+            .AddInfrastructure(builder.Configuration);
         
         
         builder.Services.AddAutoMapper(typeof(ProblemProfile).Assembly);
@@ -25,15 +34,15 @@ public class Program
         builder.Services.AddOpenApi();
         
         //  Add Swagger services
-        // builder.Services.AddEndpointsApiExplorer();
-        // builder.Services.AddSwaggerGen(c =>
-        // {
-        //     c.SwaggerDoc("v1", new OpenApiInfo
-        //     {
-        //         Title = "My API",
-        //         Version = "v1"
-        //     });
-        // });
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "CodeTeasers",
+                Version = "v1"
+            });
+        });
 
         var app = builder.Build();
 
@@ -42,12 +51,12 @@ public class Program
         {
             app.MapOpenApi();
             // Enable middleware to serve Swagger and Swagger UI
-            // app.UseSwagger();
-            // app.UseSwaggerUI(c =>
-            // {
-            //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            //     c.RoutePrefix = string.Empty; // Serve Swagger UI at root: http://localhost:5000/
-            // });
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CodeTeasers V1");
+                c.RoutePrefix = string.Empty; // Serve Swagger UI at root: http://localhost:5000/
+            });
         }
 
         app.UseHttpsRedirection();
