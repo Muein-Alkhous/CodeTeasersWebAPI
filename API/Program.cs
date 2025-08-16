@@ -1,9 +1,7 @@
 using Application;
-using Application.Interfaces.Authentication;
-using Application.MappingProfiles;
-using Application.Services.Authentication;
 using Infrastructure;
 using Infrastructure.Data;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -25,9 +23,7 @@ public class Program
             .AddApplication()
             .AddInfrastructure(builder.Configuration);
         
-        
-        builder.Services.AddAutoMapper(typeof(ProblemProfile).Assembly);
-
+        builder.Services.AddMapster();
 
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

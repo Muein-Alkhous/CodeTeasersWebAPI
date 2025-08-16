@@ -3,6 +3,6 @@ using Domain.Entities;
 namespace Application.DTOs;
 
 public record AuthenticationResponse(
-    User User,
+    UserResponse User,
     string Token 
 );

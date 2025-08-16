@@ -10,5 +10,5 @@ public partial class Category : BaseEntity
 
     public bool IsDeleted { get; set; }
 
-    public virtual ICollection<ProblemCategory> ProblemCategories { get; set; } = new List<ProblemCategory>();
+    public virtual ICollection<ProblemCategory> ProblemCategories { get; init; } = new List<ProblemCategory>();
 }

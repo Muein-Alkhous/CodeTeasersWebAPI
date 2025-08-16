@@ -2,7 +2,7 @@ using Application.DTOs;
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.MappingProfiles;
+namespace Application.Profiles;
 
 public class ProblemProfile : Profile
 {

@@ -267,6 +267,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Points)
                 .HasDefaultValue(0)
                 .HasColumnName("points");
+            entity.Property(e => e.Rank)
+                .HasColumnName("rank")
+                .HasColumnType("rank");
 
             entity.HasOne(d => d.IdNavigation).WithOne(p => p.UserStatus)
                 .HasForeignKey<UserStatus>(d => d.Id)

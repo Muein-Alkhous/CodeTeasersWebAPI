@@ -26,7 +26,7 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public async Task AddAsync(T entity)
     {
         await _context.Set<T>().AddAsync(entity);
-        await SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 
     public void Update(T entity)
