@@ -13,10 +13,6 @@ public partial class Submission : BaseEntity
 
     public int PassedTests { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
-    public bool IsDeleted { get; set; }
-
     public virtual Problem Problem { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

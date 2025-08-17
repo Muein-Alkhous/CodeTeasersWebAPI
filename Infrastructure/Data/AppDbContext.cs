@@ -53,6 +53,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .HasColumnName("title");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
@@ -60,9 +63,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValue(false)
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .HasColumnName("title");
         });
 
         modelBuilder.Entity<Description>(entity =>
@@ -74,15 +74,17 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
+            entity.Property(e => e.ShortDescription)
+                .HasColumnName("short_description");
+            entity.Property(e => e.DescriptionPath)
+                .HasColumnName("description_path");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
-            entity.Property(e => e.DescriptionPath).HasColumnName("description_path");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValue(false)
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.ShortDescription).HasColumnName("short_description");
 
             entity.HasOne(d => d.IdNavigation).WithOne(p => p.Description)
                 .HasForeignKey<Description>(d => d.Id)
@@ -133,6 +135,13 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Problem).WithMany(p => p.ProblemCategories)
                 .HasForeignKey(d => d.ProblemId)
                 .HasConstraintName("fk_problem_categories_problem_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
         });
 
         modelBuilder.Entity<Submission>(entity =>
@@ -222,6 +231,13 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Problem).WithMany(p => p.Tests)
                 .HasForeignKey(d => d.ProblemId)
                 .HasConstraintName("fk_tests_problem");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -270,6 +286,14 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Rank)
                 .HasColumnName("rank")
                 .HasColumnType("rank");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
+                
 
             entity.HasOne(d => d.IdNavigation).WithOne(p => p.UserStatus)
                 .HasForeignKey<UserStatus>(d => d.Id)

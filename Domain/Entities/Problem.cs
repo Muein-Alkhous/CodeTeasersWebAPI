@@ -6,10 +6,7 @@ public partial class Problem : BaseEntity
     public string Title { get; set; } = null!;
 
     public string Difficulty { get; set; } = null!;
-    public DateTime CreatedAt { get; set; }
-
-    public bool? IsDeleted { get; set; }
-
+    
     public virtual Description? Description { get; set; }
 
     public virtual ICollection<ProblemCategory> ProblemCategories { get; set; } = new List<ProblemCategory>();

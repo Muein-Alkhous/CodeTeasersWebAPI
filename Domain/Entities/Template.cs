@@ -9,9 +9,5 @@ public partial class Template : BaseEntity
 
     public string Language { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; }
-
-    public bool IsDeleted { get; set; }
-
     public virtual Problem Problem { get; set; } = null!;
 }
