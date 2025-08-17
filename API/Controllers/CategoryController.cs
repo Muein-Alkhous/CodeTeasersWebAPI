@@ -43,21 +43,33 @@ public class CategoryController : ControllerBase // Not Done
     [HttpPost("{title:alpha}")]
     public async Task< IActionResult> Create(string title)
     {
-        await _categoryService.CreateCategoryAsync(title);
+        var category = await _categoryService.CreateCategoryAsync(title);
+        if (category is null)
+        {
+            return BadRequest();
+        }
         return Created();
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult>  Update(Guid id, [FromQuery] string newTitle)
     {
-        await _categoryService.UpdateCategoryAsync(id, newTitle);
+        var categoryExists = await _categoryService.UpdateCategoryAsync(id, newTitle);
+        if (categoryExists is null)
+        {
+            return NotFound();
+        }
         return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _categoryService.DeleteCategoryAsync(id);
+        var isDeleted = await _categoryService.DeleteCategoryAsync(id);
+        if (!isDeleted)
+        {
+            return NotFound();
+        }
         return NoContent();
     }
     

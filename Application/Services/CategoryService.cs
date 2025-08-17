@@ -34,12 +34,12 @@ public class CategoryService : ICategoryService
         return category.Adapt<CategoryResponse>();
     }
 
-    public async Task<CategoryResponse> CreateCategoryAsync(string title)
+    public async Task<CategoryResponse?> CreateCategoryAsync(string title)
     {
         var categoryExists = await _categoryRepo.GetByTitleAsync(title);
         if (categoryExists != null)
         {
-            throw new Exception("Category already exists");
+            return null;
         }
         
         var newCategory = new Category
@@ -56,7 +56,7 @@ public class CategoryService : ICategoryService
         var oldCategory = await _categoryRepo.GetByIdAsync(id);
         if (oldCategory is null)
         {
-            throw new Exception($"Category with Id:{id} not found");
+            return null;
         }
         
         oldCategory.Title = title;
@@ -72,7 +72,7 @@ public class CategoryService : ICategoryService
 
         if (category is null)
         {
-            throw new Exception($"Category with Id:{id} not found");
+            return false;
         }
         
         category.IsDeleted = true;
