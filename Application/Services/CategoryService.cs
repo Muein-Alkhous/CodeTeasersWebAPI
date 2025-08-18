@@ -74,11 +74,16 @@ public class CategoryService : ICategoryService
         {
             return false;
         }
-        
-        category.IsDeleted = true;
+
+        _categoryRepo.Delete(category);
         
         //// I SHOULD DELETE RELATED <PROBLEMCATEGORIES> HERE 
-
+        
+        foreach (var pc in category.ProblemCategories)
+        {
+            pc.IsDeleted = true;
+        }
+        
         await _categoryRepo.SaveChangesAsync();
         
         return true;

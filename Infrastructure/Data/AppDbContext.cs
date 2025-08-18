@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Domain.Entities;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,16 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        
+        // Apply soft delete filter to all entities inheriting BaseEntity
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType)
+                    .HasQueryFilter(GetIsDeletedRestriction(entityType.ClrType));
+            }
+        }
         modelBuilder
             .HasPostgresEnum("difficulty", new[] { "Easy", "Medium", "Hard", "Expert" })
             .HasPostgresEnum("rank", new[] { "Newbie", "Beginner", "Apprentice", "Coder", "Pro", "Expert", "Master" });
@@ -285,7 +296,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("points");
             entity.Property(e => e.Rank)
                 .HasColumnName("rank")
-                .HasColumnType("rank");
+                .HasConversion(
+                    v => v,     // C# string → DB value
+                    v => v      // DB value → C# string
+                )
+                .HasDefaultValue("Newbie");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
@@ -301,6 +316,43 @@ public partial class AppDbContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);
+    }
+    
+    private static LambdaExpression GetIsDeletedRestriction(Type type)
+    {
+        var param = Expression.Parameter(type, "e");
+        var prop = Expression.Property(param, nameof(BaseEntity.IsDeleted));
+        var condition = Expression.Equal(prop, Expression.Constant(false));
+        return Expression.Lambda(condition, param);
+    }
+    
+    // Add your SaveChanges overrides here 👇
+    public override int SaveChanges()
+    {
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            if (entry.State == EntityState.Deleted)
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+            }
+        }
+
+        return base.SaveChanges();
+    }
+    
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            if (entry.State == EntityState.Deleted)
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+            }
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

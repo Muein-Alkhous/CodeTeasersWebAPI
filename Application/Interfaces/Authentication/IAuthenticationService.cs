@@ -4,6 +4,6 @@ namespace Application.Interfaces.Authentication;
 
 public interface IAuthenticationService
 {
-    AuthenticationResponse Login(LoginRequest loginRequest);
-    AuthenticationResponse Register(RegisterRequest registerRequest);
+    Task<AuthenticationResponse?> Login(LoginRequest loginRequest);
+    Task<AuthenticationResponse?> Register(RegisterRequest registerRequest);
 }

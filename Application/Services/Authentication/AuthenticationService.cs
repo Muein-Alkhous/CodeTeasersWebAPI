@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services.Authentication;
 
@@ -12,60 +13,66 @@ public class AuthenticationService :  IAuthenticationService
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-
-    public AuthenticationService(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository, IMapper mapper)
+    public AuthenticationService(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository, IMapper mapper, IPasswordHasher<User> passwordHasher)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
         _mapper = mapper;
+        _passwordHasher = passwordHasher;
     }
 
-    public AuthenticationResponse Register(RegisterRequest registerRequest)
+    public async Task<AuthenticationResponse?> Register(RegisterRequest registerRequest)
     {
         // 1. Validate if the user doesn't exist
-        var userExist = _userRepository.GetByUsernameAsync(registerRequest.Username).Result;
+        var userExist = await _userRepository.GetByUsernameAsync(registerRequest.Username);
         if (userExist != null)
         {
-            throw new Exception("Username already exists");
+            return null;
         }
+        
+        // Hashing the password
         
         // 2. Create user (generate unique ID)
         var user = new User
         {
             Username = registerRequest.Username,
             Email = registerRequest.Email,
-            Password = registerRequest.Password,
         };
-
-        var userStatus = new UserStatus();
         
+        // Hashing password
+        var hashedPassword = HashPassword(user, registerRequest.Password);
+        user.Password = hashedPassword;
+
+        // Adding status to user
+        var userStatus = new UserStatus();
         user.UserStatus = userStatus;
         
-        _userRepository.AddAsync(user);
+        await _userRepository.AddAsync(user);
 
         var userResponse = _mapper.Map<UserResponse>(user);
         
         // 3. Create JWT Token
-        
         var token = _jwtTokenGenerator.GenerateToken(user);
         
         return new AuthenticationResponse(userResponse, token);
     }
     
-    public AuthenticationResponse Login(LoginRequest loginRequest)
+    public async Task<AuthenticationResponse?> Login(LoginRequest loginRequest)
     {
         
-        var user = _userRepository.GetByUsernameAsync(loginRequest.Username).Result;
+        var user = await _userRepository.GetByUsernameAsync(loginRequest.Username);
         
         if (user == null)
         {
-            throw new Exception("Username doesn't exists");
+            return null; // User doesn't exist
         }
 
-        if (user.Password != loginRequest.Password)
+        var result = VerifyPassword(user, user.Password, loginRequest.Password);
+        if (result)
         {
-            throw new Exception("Wrong password");
+            return null;
         }
         
         var userResponse = _mapper.Map<UserResponse>(user);
@@ -73,6 +80,20 @@ public class AuthenticationService :  IAuthenticationService
         var token = _jwtTokenGenerator.GenerateToken(user);
         
         return new AuthenticationResponse(userResponse, token);
+    }
+
+    
+    
+    // Helper Functions
+    private string HashPassword(User user, string password)
+    {
+        return _passwordHasher.HashPassword(user, password);
+    }
+
+    private bool VerifyPassword(User user, string password, string hashedPassword)
+    {
+        var result = _passwordHasher.VerifyHashedPassword(user, hashedPassword, password);
+        return result == PasswordVerificationResult.Success;
     }
 
 }

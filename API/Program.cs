@@ -29,6 +29,9 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         
+        // Add Problem Details
+        builder.Services.AddProblemDetails();
+        
         //  Add Swagger services
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
@@ -56,6 +59,10 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        
+        app.UseExceptionHandler();
+        
+        app.UseStatusCodePages();
 
         app.UseAuthorization();
         

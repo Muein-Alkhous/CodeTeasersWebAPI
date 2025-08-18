@@ -2,6 +2,8 @@ using Application.Interfaces;
 using Application.Interfaces.Authentication;
 using Application.Services;
 using Application.Services.Authentication;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -12,6 +14,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         return services;
     }
 }
