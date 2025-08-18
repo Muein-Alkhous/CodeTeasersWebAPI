@@ -20,12 +20,45 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository
             .FirstOrDefaultAsync(e => e.Title == title);
     }
 
-    public async Task<IEnumerable<Problem>> GetProblemsByCategory(Guid categoryId)
+    public async Task<IEnumerable<Problem>> GetProblemsByCategoryAsync(Guid categoryId)
     {
         return await _context.Problems
             .Where(p => p.ProblemCategories.Any(pc => pc.CategoryId == categoryId))
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Problem>> GetProblemsByCategoryAsync(string title)
+    {
+        var category = await _context.Categories
+            .FirstOrDefaultAsync(c => c.Title == title);
+        return await _context.Problems
+            .Where(p => p.ProblemCategories.Any(pc => pc.CategoryId == category!.Id))
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Problem>> GetProblemsByDifficultyAsync(string difficulty)
+    {
+        return await _context.Problems
+            .Where(p => p.Difficulty == difficulty)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Problem>> GetProblemsByUserAsync(Guid userId)
+    {
+        return await _context.Problems
+            .Where(p => p.Submissions.Any(s => s.UserId == userId))
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Problem>> GetProblemsByUserAsync(string username)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Username == username);
+        return await _context.Problems
+            .Where(p => p.Submissions.Any(s => s.UserId == user!.Id))
+            .ToListAsync();
+    }
+
 
     public async Task AssignCategoryToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds)
     {

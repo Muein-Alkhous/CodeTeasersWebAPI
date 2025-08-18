@@ -31,7 +31,7 @@ public class CategoryService : ICategoryService
     public async Task<CategoryResponse?> GetCategoryByTitleAsync(string title)
     {
         var category = await _categoryRepo.GetByTitleAsync(title);
-        return category.Adapt<CategoryResponse>();
+        return category?.Adapt<CategoryResponse>();
     }
 
     public async Task<CategoryResponse?> CreateCategoryAsync(string title)

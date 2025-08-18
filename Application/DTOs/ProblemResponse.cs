@@ -1,6 +1,11 @@
+using Domain.Entities;
+
 namespace Application.DTOs;
 
-public class ProblemResponse
-{
-    
-}
+public record ProblemResponse
+(
+    Guid Id,
+    string Title,
+    string Difficulty,
+    IEnumerable<CategoryResponse> CategoryResponses
+);
