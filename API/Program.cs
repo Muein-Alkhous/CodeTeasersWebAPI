@@ -1,4 +1,5 @@
 using Application;
+using Domain.Enums;
 using Infrastructure;
 using Infrastructure.Data;
 using Mapster;

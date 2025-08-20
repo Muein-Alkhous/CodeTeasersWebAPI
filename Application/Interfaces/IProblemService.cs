@@ -18,8 +18,7 @@ public interface IProblemService
     Task<ProblemResponse?> UpdateProblemAsync(Guid id, ProblemRequest request);
     Task<bool> DeleteProblemAsync(Guid id);
     
-    Task<bool> AssignCategoryToProblemAsync(Guid problemId, Guid categoryId);
-    Task<bool> UnassignCategoryFromProblemAsync(Guid problemId, Guid categoryId);
+    Task<bool> AssignCategoriesToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds);
     
     Task<bool> AssignTestToProblemAsync(Guid problemId, Guid testId);
     Task<bool> UnAssignTestFromProblemAsync(Guid problemId, Guid testId);

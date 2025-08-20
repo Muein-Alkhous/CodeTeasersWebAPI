@@ -14,6 +14,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IProblemService, ProblemService>();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         return services;
     }

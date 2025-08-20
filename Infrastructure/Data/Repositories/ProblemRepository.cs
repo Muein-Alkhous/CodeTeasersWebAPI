@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,7 +61,7 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository
     }
 
 
-    public async Task AssignCategoryToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds)
+    public async Task AssignCategoriesToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds)
     {
         // Get existing category links to avoid duplicates
         var existingCategoryIds = await _context.ProblemCategories
@@ -79,5 +80,20 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository
         var problemCategories = newLinks.ToList();
         if (problemCategories.Count != 0)
             await _context.ProblemCategories.AddRangeAsync(problemCategories);
+    }
+
+    public async Task AssignTestToProblemAsync(Guid problemId, Guid testId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task AssignDescriptionToProblemAsync(Guid problemId, Guid descriptionId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task AssignTemplateToProblemAsync(Guid problemId, Guid templateId)
+    {
+        throw new NotImplementedException();
     }
 }

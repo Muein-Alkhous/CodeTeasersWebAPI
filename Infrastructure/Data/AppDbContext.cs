@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,21 +20,13 @@ public partial class AppDbContext : DbContext
     }
 
     public virtual DbSet<Category> Categories { get; set; }
-
     public virtual DbSet<Description> Descriptions { get; set; }
-
     public virtual DbSet<Problem> Problems { get; set; }
-
     public virtual DbSet<ProblemCategory> ProblemCategories { get; set; }
-
     public virtual DbSet<Submission> Submissions { get; set; }
-
     public virtual DbSet<Template> Templates { get; set; }
-
     public virtual DbSet<Test> Tests { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
-
     public virtual DbSet<UserStatus> UserStatuses { get; set; }
     
 
@@ -49,10 +42,6 @@ public partial class AppDbContext : DbContext
                     .HasQueryFilter(GetIsDeletedRestriction(entityType.ClrType));
             }
         }
-        modelBuilder
-            .HasPostgresEnum("difficulty", new[] { "Easy", "Medium", "Hard", "Expert" })
-            .HasPostgresEnum("rank", new[] { "Newbie", "Beginner", "Apprentice", "Coder", "Pro", "Expert", "Master" });
-
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("categories_pkey");
@@ -116,8 +105,8 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("title");
             entity.Property(e => e.Difficulty)
-                .HasColumnType("difficulty")
-                .HasColumnName("difficulty");
+                .HasColumnName("difficulty")
+                .HasMaxLength(20);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
@@ -296,11 +285,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("points");
             entity.Property(e => e.Rank)
                 .HasColumnName("rank")
-                .HasConversion(
-                    v => v,     // C# string → DB value
-                    v => v      // DB value → C# string
-                )
-                .HasDefaultValue("Newbie");
+                .HasMaxLength(20);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")

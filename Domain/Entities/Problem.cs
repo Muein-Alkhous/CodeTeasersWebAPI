@@ -1,11 +1,13 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Enums;
+
+namespace Domain.Entities;
 
 public partial class Problem : BaseEntity
 {
     
     public string Title { get; set; } = null!;
 
-    public string Difficulty { get; set; } = null!;
+    public string Difficulty { get; set; } =  null!;
     
     public virtual Description? Description { get; set; }
 

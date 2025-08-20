@@ -20,8 +20,6 @@ namespace Infrastructure.Data.Migrations
                 .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "difficulty", new[] { "Easy", "Medium", "Hard", "Expert" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "rank", new[] { "Newbie", "Beginner", "Apprentice", "Coder", "Pro", "Expert", "Master" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Domain.Entities.Category", b =>
@@ -104,7 +102,8 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Difficulty")
                         .IsRequired()
-                        .HasColumnType("difficulty")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("difficulty");
 
                     b.Property<bool>("IsDeleted")
@@ -379,7 +378,8 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Rank")
                         .IsRequired()
-                        .HasColumnType("rank")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("rank");
 
                     b.HasKey("Id")

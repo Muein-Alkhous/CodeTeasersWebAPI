@@ -1,5 +1,7 @@
 using Application.DTOs;
 using Application.Interfaces;
+using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using Mapster;
 
@@ -65,28 +67,73 @@ public class ProblemService :  IProblemService
 
     public async Task<ProblemResponse?> CreateProblemAsync(ProblemRequest request)
     {
-        throw new NotImplementedException();
+        var problem = await _problemRepo.GetProblemByTitleAsync(request.Title);
+        if (problem != null)
+        {
+            return null;
+        }
+        
+        var newProblem = new Problem
+        {
+            Title = request.Title,
+        };
+        
+        await _problemRepo.AssignCategoriesToProblemAsync(newProblem.Id, request.CategoriesId);
+        
+        await _problemRepo.AddAsync(newProblem);
+        
+        return newProblem.Adapt<ProblemResponse>();
     }
 
     public async Task<ProblemResponse?> UpdateProblemAsync(Guid id, ProblemRequest request)
     {
-        throw new NotImplementedException();
+        var oldProblem = await _problemRepo.GetByIdAsync(id);
+        if (oldProblem is null)
+        {
+            return null;
+        }
+        
+        oldProblem.Title = request.Title;
+        oldProblem.Difficulty = request.Difficulty;
+        
+        _problemRepo.Update(oldProblem);
+        
+        return oldProblem.Adapt<ProblemResponse>();
     }
 
     public async Task<bool> DeleteProblemAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var problem = await _problemRepo.GetByIdAsync(id);
+
+        if (problem is null)
+        {
+            return false;
+        }
+
+        _problemRepo.Delete(problem);
+        
+        //// I SHOULD DELETE RELATED <PROBLEMCATEGORIES> HERE 
+        
+        foreach (var pc in problem.ProblemCategories)
+        {
+            pc.IsDeleted = true;
+        }
+        
+        await _problemRepo.SaveChangesAsync();
+        
+        return true;
     }
 
-    public async Task<bool> AssignCategoryToProblemAsync(Guid problemId, Guid categoryId)
+    public async Task<bool> AssignCategoriesToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds)
     {
-        throw new NotImplementedException();
+        var problem = await _problemRepo.GetByIdAsync(problemId);
+        if (problem is null)  return false;
+        await _problemRepo.AssignCategoriesToProblemAsync(problemId, categoryIds);
+        return true;
+
     }
 
-    public async Task<bool> UnassignCategoryFromProblemAsync(Guid problemId, Guid categoryId)
-    {
-        throw new NotImplementedException();
-    }
+
 
     public async Task<bool> AssignTestToProblemAsync(Guid problemId, Guid testId)
     {

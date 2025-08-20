@@ -19,31 +19,43 @@ public class ProblemController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        throw new NotImplementedException();
+        var problems = await _problemService.GetAllProblemsAsync();
+        return Ok(problems);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
-        throw new NotImplementedException();
+        var problem =  await _problemService.GetProblemByIdAsync(id);
+        return Ok(problem);
+    }
+    
+    [HttpGet("{title}")]
+    public async Task<IActionResult> Get(string title)
+    {
+        var problem =  await _problemService.GetProblemByTitleAsync(title);
+        return Ok(problem);
     }
 
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] ProblemRequest problemRequest)
     {
-        throw new NotImplementedException();
+        var problem = await _problemService.CreateProblemAsync(problemRequest);
+        return Created("", problem);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Put(Guid id, [FromBody] ProblemRequest problemRequest)
     {
-        throw new NotImplementedException();
+        await _problemService.UpdateProblemAsync(id, problemRequest);
+        return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        throw new NotImplementedException();
+        await _problemService.DeleteProblemAsync(id);
+        return NoContent();
     }
     
 }

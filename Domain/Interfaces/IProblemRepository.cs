@@ -10,5 +10,8 @@ public interface IProblemRepository : IRepository<Problem>
     Task<IEnumerable<Problem>> GetProblemsByDifficultyAsync(string difficulty);
     Task<IEnumerable<Problem>> GetProblemsByUserAsync(Guid userId);
     Task<IEnumerable<Problem>> GetProblemsByUserAsync(string username);
-    Task AssignCategoryToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds);
+    Task AssignCategoriesToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds);
+    Task AssignTestToProblemAsync(Guid problemId, Guid testId);
+    Task AssignDescriptionToProblemAsync(Guid problemId, Guid descriptionId);
+    Task AssignTemplateToProblemAsync(Guid problemId, Guid templateId);
 }
