@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Domain.Entities;
-using Domain.Enums;
-using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -44,7 +40,9 @@ public partial class AppDbContext : DbContext
         }
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("categories_pkey");
+            entity
+                .HasKey(e => e.Id)
+                .HasName("categories_pkey");
 
             entity.ToTable("categories");
 

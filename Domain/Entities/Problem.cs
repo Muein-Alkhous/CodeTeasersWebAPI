@@ -1,6 +1,4 @@
-﻿using Domain.Enums;
-
-namespace Domain.Entities;
+﻿namespace Domain.Entities;
 
 public partial class Problem : BaseEntity
 {
