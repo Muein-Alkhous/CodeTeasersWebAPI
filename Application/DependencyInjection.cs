@@ -3,6 +3,7 @@ using Application.Interfaces.Authentication;
 using Application.Services;
 using Application.Services.Authentication;
 using Domain.Entities;
+using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 

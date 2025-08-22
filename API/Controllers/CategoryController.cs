@@ -31,7 +31,7 @@ public class CategoryController : ControllerBase // Not Done
         return Ok(category);
     }
 
-    [HttpGet("{title:alpha}")]
+    [HttpGet("{title}")]
     public async Task<IActionResult> GetByTitle(string title)
     {
         var category = await _categoryService.GetCategoryByTitleAsync(title);
@@ -40,25 +40,17 @@ public class CategoryController : ControllerBase // Not Done
         return Ok(category);
     }
 
-    [HttpPost("{title:alpha}")]
+    [HttpPost("{title}")]
     public async Task< IActionResult> Create(string title)
     {
         var category = await _categoryService.CreateCategoryAsync(title);
-        if (category is null)
-        {
-            return BadRequest();
-        }
         return Created();
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult>  Update(Guid id, [FromQuery] string newTitle)
-    {
-        var categoryExists = await _categoryService.UpdateCategoryAsync(id, newTitle);
-        if (categoryExists is null)
-        {
-            return NotFound();
-        }
+    { 
+        await _categoryService.UpdateCategoryAsync(id, newTitle);
         return NoContent();
     }
 

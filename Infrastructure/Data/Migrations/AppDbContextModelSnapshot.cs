@@ -78,10 +78,6 @@ namespace Infrastructure.Data.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("is_deleted");
 
-                    b.Property<string>("ShortDescription")
-                        .HasColumnType("text")
-                        .HasColumnName("short_description");
-
                     b.HasKey("Id")
                         .HasName("descriptions_pkey");
 

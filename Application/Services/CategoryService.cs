@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.Exceptions;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -18,19 +19,24 @@ public class CategoryService : ICategoryService
 
     public async Task<IEnumerable<CategoryResponse>> GetAllCategoriesAsync()
     {
-        var categories =  await _categoryRepo.GetAllAsync();
+        var categories =  await _categoryRepo.GetAllCategoriesAsync();
+            
         return categories.Adapt<IEnumerable<CategoryResponse>>();
     }
 
     public async Task<CategoryResponse?> GetCategoryByIdAsync(Guid id)
     {
-        var category = await _categoryRepo.GetByIdAsync(id);
+        var category = await _categoryRepo.GetCategoryByIdAsync(id);
+        if (category == null)
+            throw new NotFoundException($"Category with Id:{id} was not found");
         return category?.Adapt<CategoryResponse>();
     }
 
     public async Task<CategoryResponse?> GetCategoryByTitleAsync(string title)
     {
         var category = await _categoryRepo.GetByTitleAsync(title);
+        if (category == null)
+            throw new NotFoundException($"Category with Title:{title} was not found");
         return category?.Adapt<CategoryResponse>();
     }
 
@@ -39,7 +45,7 @@ public class CategoryService : ICategoryService
         var categoryExists = await _categoryRepo.GetByTitleAsync(title);
         if (categoryExists != null)
         {
-            return null;
+            throw new ConflictException($"Category with title:{title} already exists");
         }
         
         var newCategory = new Category
@@ -53,7 +59,7 @@ public class CategoryService : ICategoryService
 
     public async Task<CategoryResponse?> UpdateCategoryAsync(Guid id, string title)
     {
-        var oldCategory = await _categoryRepo.GetByIdAsync(id);
+        var oldCategory = await _categoryRepo.GetCategoryByIdAsync(id);
         if (oldCategory is null)
         {
             return null;
@@ -68,7 +74,7 @@ public class CategoryService : ICategoryService
 
     public async Task<bool> DeleteCategoryAsync(Guid id)
     {
-        var category = await _categoryRepo.GetByIdAsync(id);
+        var category = await _categoryRepo.GetCategoryByIdAsync(id);
 
         if (category is null)
         {

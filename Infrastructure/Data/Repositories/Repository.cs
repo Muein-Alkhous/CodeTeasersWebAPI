@@ -13,14 +13,9 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         _context = context;
     }
 
-    public async Task<T?> GetByIdAsync(Guid entityId)
+    public async Task<bool> ExistsAsync(Guid id)
     {
-        return await _context.Set<T>().FindAsync(entityId);
-    }
-
-    public async Task<IEnumerable<T>> GetAllAsync()
-    {
-        return await _context.Set<T>().ToListAsync();
+        return await _context.Set<T>().AnyAsync(e => e.Id == id);
     }
 
     public async Task AddAsync(T entity)

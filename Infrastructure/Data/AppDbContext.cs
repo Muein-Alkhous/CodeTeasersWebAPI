@@ -72,8 +72,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
-            entity.Property(e => e.ShortDescription)
-                .HasColumnName("short_description");
             entity.Property(e => e.DescriptionPath)
                 .HasColumnName("description_path");
             entity.Property(e => e.CreatedAt)

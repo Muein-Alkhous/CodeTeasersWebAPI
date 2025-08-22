@@ -1,8 +1,10 @@
 using Application.DTOs;
+using Application.Exceptions;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
 using Mapster;
+using MapsterMapper;
 
 namespace Application.Services;
 
@@ -10,27 +12,35 @@ public class ProblemService :  IProblemService
 {
     
     private readonly IProblemRepository _problemRepo;
+    private readonly ICategoryRepository _categoryRepo;
+    private readonly IUserRepository _userRepo;
 
-    public ProblemService(IProblemRepository problemRepo)
+    public ProblemService(IProblemRepository problemRepo, ICategoryRepository categoryRepo, IUserRepository userRepo)
     {
         _problemRepo = problemRepo;
+        _categoryRepo = categoryRepo;
+        _userRepo = userRepo;
     }
 
     public async Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync()
     {
-        var problems = await _problemRepo.GetAllAsync();
+        var problems = await _problemRepo.GetAllProblemsAsync();
         return problems.Adapt<IEnumerable<ProblemResponse>>();
     }
 
     public async Task<ProblemResponse?> GetProblemByIdAsync(Guid id)
     {
-        var problem = await _problemRepo.GetByIdAsync(id);
+        var problem = await _problemRepo.GetProblemByIdAsync(id);
+        if (problem == null)
+            throw new NotFoundException($"Problem with Id:{id} not found");
         return problem?.Adapt<ProblemResponse>();
     }
 
     public async Task<ProblemResponse?> GetProblemByTitleAsync(string title)
     {
         var problem = await _problemRepo.GetProblemByTitleAsync(title);
+        if (problem == null)
+            throw new NotFoundException($"Problem with Title:{title} not found");
         return problem?.Adapt<ProblemResponse>();
     }
 
@@ -42,12 +52,16 @@ public class ProblemService :  IProblemService
 
     public async Task<IEnumerable<ProblemResponse>> GetProblemsByCategoryAsync(Guid id)
     {
+        if (await _categoryRepo.ExistsAsync(id))
+            throw new NotFoundException($"Category with Id:{id} not found");
         var problems = await _problemRepo.GetProblemsByCategoryAsync(id);
         return  problems.Adapt<IEnumerable<ProblemResponse>>();
     }
 
     public async Task<IEnumerable<ProblemResponse>> GetProblemsByCategoryAsync(string title)
     {
+        if(await _categoryRepo.CategoryExistsByTitleAsync(title))
+            throw new NotFoundException($"Category with Title:{title} not found");
         var problems = await _problemRepo.GetProblemsByCategoryAsync(title);
         return  problems.Adapt<IEnumerable<ProblemResponse>>();
     }
@@ -69,27 +83,41 @@ public class ProblemService :  IProblemService
         var problem = await _problemRepo.GetProblemByTitleAsync(request.Title);
         if (problem != null)
         {
-            return null;
+            throw new ConflictException($"Problem with title:{request.Title} already exists");
         }
-        
+
+        foreach (var categoryId in request.CategoriesId)
+        {
+            if(!await _categoryRepo.ExistsAsync(categoryId))
+                throw new NotFoundException($"Category with id:{categoryId} does not exist");
+        }
+
         var newProblem = new Problem
         {
             Title = request.Title,
+            Difficulty = request.Difficulty,
         };
-        
+
         await _problemRepo.AssignCategoriesToProblemAsync(newProblem.Id, request.CategoriesId);
         
         await _problemRepo.AddAsync(newProblem);
+        var problemToReturn = await _problemRepo.GetProblemByIdAsync(newProblem.Id);
         
-        return newProblem.Adapt<ProblemResponse>();
+        return problemToReturn.Adapt<ProblemResponse>();
     }
 
     public async Task<ProblemResponse?> UpdateProblemAsync(Guid id, ProblemRequest request)
     {
-        var oldProblem = await _problemRepo.GetByIdAsync(id);
-        if (oldProblem is null)
+        var oldProblem = await _problemRepo.GetProblemByIdAsync(id);
+        if (oldProblem == null)
         {
-            return null;
+            throw new ConflictException($"Problem with title:{request.Title} does not exists");
+        }
+
+        foreach (var categoryId in request.CategoriesId)
+        {
+            if(!await _categoryRepo.ExistsAsync(categoryId))
+                throw new NotFoundException($"Category with id:{categoryId} does not exist");
         }
         
         oldProblem.Title = request.Title;
@@ -102,7 +130,7 @@ public class ProblemService :  IProblemService
 
     public async Task<bool> DeleteProblemAsync(Guid id)
     {
-        var problem = await _problemRepo.GetByIdAsync(id);
+        var problem = await _problemRepo.GetProblemByIdAsync(id);
 
         if (problem is null)
         {
@@ -125,7 +153,7 @@ public class ProblemService :  IProblemService
 
     public async Task<bool> AssignCategoriesToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds)
     {
-        var problem = await _problemRepo.GetByIdAsync(problemId);
+        var problem = await _problemRepo.GetProblemByIdAsync(problemId);
         if (problem is null)  return false;
         await _problemRepo.AssignCategoriesToProblemAsync(problemId, categoryIds);
         return true;

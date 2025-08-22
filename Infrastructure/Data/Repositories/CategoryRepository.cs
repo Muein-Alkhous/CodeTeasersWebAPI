@@ -8,6 +8,21 @@ public class CategoryRepository(AppDbContext context) : Repository<Category>(con
 {
     private readonly AppDbContext _context = context;
 
+    public async Task<bool> CategoryExistsByTitleAsync(string titles)
+    {
+        return await _context.Categories.AnyAsync(c => c.Title == titles);
+    }
+
+    public async Task<List<Category>> GetAllCategoriesAsync()
+    {
+        return await _context.Categories.ToListAsync();
+    }
+
+    public async Task<Category?> GetCategoryByIdAsync(Guid id)
+    {
+        return await _context.Categories.FindAsync(id);
+    }
+
     public async Task<Category?> GetByTitleAsync(string title)
     {
         return  await _context

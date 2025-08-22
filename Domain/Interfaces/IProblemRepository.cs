@@ -4,7 +4,10 @@ namespace Domain.Interfaces;
 
 public interface IProblemRepository : IRepository<Problem>
 {
+    Task<List<Problem>> GetAllProblemsAsync();
+    Task<Problem?> GetProblemByIdAsync(Guid id);
     Task<Problem?> GetProblemByTitleAsync(string title);
+    Task<List<Category>> GetCategoriesFromProblemAsync(Guid problemId);
     Task<IEnumerable<Problem>> GetProblemsByCategoryAsync(Guid categoryId);
     Task<IEnumerable<Problem>> GetProblemsByCategoryAsync(string title);
     Task<IEnumerable<Problem>> GetProblemsByDifficultyAsync(string difficulty);

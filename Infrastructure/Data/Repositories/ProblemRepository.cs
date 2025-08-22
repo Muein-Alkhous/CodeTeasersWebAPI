@@ -13,11 +13,38 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository
         _context = context;
     }
 
+    public async Task<List<Problem>> GetAllProblemsAsync()
+    {
+        return await _context .Problems
+            .Include(p => p.ProblemCategories)
+            .ThenInclude(pc => pc.Category)
+            .ToListAsync();
+    }
+
+    public async Task<Problem?> GetProblemByIdAsync(Guid id)
+    {
+        return await _context.Problems
+            .Include(p => p.ProblemCategories)
+            .ThenInclude(pc => pc.Category)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
     public async Task<Problem?> GetProblemByTitleAsync(string title)
     {
         return await _context
             .Problems
+            .Include(p => p.ProblemCategories)
+            .ThenInclude(pc => pc.Category)
             .FirstOrDefaultAsync(e => e.Title == title);
+    }
+
+    public async Task<List<Category>> GetCategoriesFromProblemAsync(Guid problemId)
+    {
+        return await _context.Problems
+            .Where(p => p.Id == problemId)
+            .SelectMany(p => p.ProblemCategories)
+            .Select(pc => pc.Category)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Problem>> GetProblemsByCategoryAsync(Guid categoryId)

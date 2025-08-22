@@ -42,6 +42,8 @@ public class Program
                 Version = "v1"
             });
         });
+        
+        MappingConfig.Configure();
 
         var app = builder.Build();
 
