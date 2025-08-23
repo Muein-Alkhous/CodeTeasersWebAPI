@@ -141,15 +141,6 @@ public class ProblemService :  IProblemService
 
         _problemRepo.Delete(problem);
         
-        //// I SHOULD DELETE RELATED <PROBLEMCATEGORIES> HERE 
-        
-        foreach (var pc in problem.ProblemCategories)
-        {
-            pc.IsDeleted = true;
-        }
-        
-        await _problemRepo.SaveChangesAsync();
-        
         return true;
     }
 

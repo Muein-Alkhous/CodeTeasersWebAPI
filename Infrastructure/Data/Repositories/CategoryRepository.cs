@@ -8,9 +8,9 @@ public class CategoryRepository(AppDbContext context) : Repository<Category>(con
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<bool> CategoryExistsByTitleAsync(string titles)
+    public async Task<bool> CategoryExistsByTitleAsync(string title)
     {
-        return await _context.Categories.AnyAsync(c => c.Title == titles);
+        return await _context.Categories.AnyAsync(c => c.Title == title);
     }
 
     public async Task<List<Category>> GetAllCategoriesAsync()

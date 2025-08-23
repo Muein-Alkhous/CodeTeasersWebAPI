@@ -4,7 +4,7 @@ namespace Domain.Interfaces;
 
 public interface ICategoryRepository : IRepository<Category>
 {
-    Task<bool> CategoryExistsByTitleAsync(string titles);
+    Task<bool> CategoryExistsByTitleAsync(string title);
     Task<List<Category>> GetAllCategoriesAsync();
     Task<Category?> GetCategoryByIdAsync(Guid id);
     Task<Category?> GetByTitleAsync(string title);

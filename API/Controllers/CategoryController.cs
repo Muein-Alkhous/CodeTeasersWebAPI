@@ -1,5 +1,4 @@
 using Application.Interfaces;
-using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -31,7 +30,7 @@ public class CategoryController : ControllerBase // Not Done
         return Ok(category);
     }
 
-    [HttpGet("{title}")]
+    [HttpGet("by-title/{title}")]
     public async Task<IActionResult> GetByTitle(string title)
     {
         var category = await _categoryService.GetCategoryByTitleAsync(title);
@@ -44,24 +43,20 @@ public class CategoryController : ControllerBase // Not Done
     public async Task< IActionResult> Create(string title)
     {
         var category = await _categoryService.CreateCategoryAsync(title);
-        return Created();
+        return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult>  Update(Guid id, [FromQuery] string newTitle)
     { 
-        await _categoryService.UpdateCategoryAsync(id, newTitle);
-        return NoContent();
+        var updatedCategory = await _categoryService.UpdateCategoryAsync(id, newTitle);
+        return Ok(updatedCategory);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var deletedCategory = await _categoryService.DeleteCategoryAsync(id);
-        if (!deletedCategory)
-        {
-            return NotFound();
-        }
         return NoContent();
     }
     

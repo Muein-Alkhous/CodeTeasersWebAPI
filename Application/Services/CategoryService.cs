@@ -41,7 +41,7 @@ public class CategoryService : ICategoryService
         return category?.Adapt<CategoryResponse>();
     }
 
-    public async Task<CategoryResponse?> CreateCategoryAsync(string title)
+    public async Task<CategoryResponse> CreateCategoryAsync(string title)
     {
         var categoryExists = await _categoryRepo.GetByTitleAsync(title);
         if (categoryExists != null)
@@ -63,7 +63,7 @@ public class CategoryService : ICategoryService
         var oldCategory = await _categoryRepo.GetCategoryByIdAsync(id);
         if (oldCategory is null)
         {
-            return null;
+            throw new NotFoundException($"Category with Id:{id} was not found");
         }
         
         oldCategory.Title = title;
@@ -73,27 +73,18 @@ public class CategoryService : ICategoryService
         return oldCategory.Adapt<CategoryResponse>();
     }
 
-    public async Task<bool> DeleteCategoryAsync(Guid id)
+    public async Task<CategoryResponse> DeleteCategoryAsync(Guid id)
     {
         var category = await _categoryRepo.GetCategoryByIdAsync(id);
 
         if (category is null)
         {
-            return false;
+            throw new NotFoundException($"Category with Id:{id} was not found");
         }
 
         _categoryRepo.Delete(category);
         
-        //// I SHOULD DELETE RELATED <PROBLEMCATEGORIES> HERE 
-        
-        foreach (var pc in category.ProblemCategories)
-        {
-            pc.IsDeleted = true;
-        }
-        
-        await _categoryRepo.SaveChangesAsync();
-        
-        return true;
+        return category.Adapt<CategoryResponse>();
     }
 
     public async Task<IEnumerable<CategoryResponse>> GetCategoriesByProblemIdAsync(Guid problemId)
