@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Application.DTOs;
+namespace Application.DTOs.Response;
 
 public record ProblemResponse
 (

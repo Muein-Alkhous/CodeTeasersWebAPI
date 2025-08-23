@@ -1,4 +1,6 @@
 using Application.DTOs;
+using Application.DTOs.Request;
+using Application.DTOs.Response;
 using Application.Exceptions;
 using Application.Interfaces;
 using Domain.Entities;
