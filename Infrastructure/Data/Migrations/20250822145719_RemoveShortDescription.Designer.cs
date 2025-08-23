@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250822145719_RemoveShortDescription")]
+    partial class RemoveShortDescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,6 +36,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -66,6 +75,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description_path");
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
                     b.HasKey("Id")
                         .HasName("descriptions_pkey");
 
@@ -89,6 +104,12 @@ namespace Infrastructure.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("difficulty");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -118,6 +139,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
                     b.Property<Guid>("ProblemId")
                         .HasColumnType("uuid")
                         .HasColumnName("problem_id");
@@ -143,6 +170,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Language")
                         .IsRequired()
@@ -191,6 +224,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
                     b.Property<string>("Language")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -228,6 +267,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Language")
                         .IsRequired()
@@ -276,6 +321,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("email");
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text")
@@ -311,6 +362,12 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<int>("Points")
                         .ValueGeneratedOnAdd()
