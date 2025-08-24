@@ -15,13 +15,12 @@ public class ProblemService :  IProblemService
     
     private readonly IProblemRepository _problemRepo;
     private readonly ICategoryRepository _categoryRepo;
-    private readonly IUserRepository _userRepo;
 
-    public ProblemService(IProblemRepository problemRepo, ICategoryRepository categoryRepo, IUserRepository userRepo)
+
+    public ProblemService(IProblemRepository problemRepo, ICategoryRepository categoryRepo)
     {
         _problemRepo = problemRepo;
         _categoryRepo = categoryRepo;
-        _userRepo = userRepo;
     }
 
     public async Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync()
@@ -54,7 +53,7 @@ public class ProblemService :  IProblemService
 
     public async Task<IEnumerable<ProblemResponse>> GetProblemsByCategoryAsync(Guid id)
     {
-        if (await _categoryRepo.ExistsAsync(id))
+        if (!await _categoryRepo.ExistsAsync(id))
             throw new NotFoundException($"Category with Id:{id} not found");
         var problems = await _problemRepo.GetProblemsByCategoryAsync(id);
         return  problems.Adapt<IEnumerable<ProblemResponse>>();
@@ -62,7 +61,7 @@ public class ProblemService :  IProblemService
 
     public async Task<IEnumerable<ProblemResponse>> GetProblemsByCategoryAsync(string title)
     {
-        if(await _categoryRepo.CategoryExistsByTitleAsync(title))
+        if(!await _categoryRepo.CategoryExistsByTitleAsync(title))
             throw new NotFoundException($"Category with Title:{title} not found");
         var problems = await _problemRepo.GetProblemsByCategoryAsync(title);
         return  problems.Adapt<IEnumerable<ProblemResponse>>();
@@ -82,8 +81,8 @@ public class ProblemService :  IProblemService
 
     public async Task<ProblemResponse?> CreateProblemAsync(ProblemRequest request)
     {
-        var problem = await _problemRepo.GetProblemByTitleAsync(request.Title);
-        if (problem != null)
+       
+        if (!await _problemRepo.ExistsByTitleAsync(request.Title))
         {
             throw new ConflictException($"Problem with title:{request.Title} already exists");
         }
@@ -100,9 +99,10 @@ public class ProblemService :  IProblemService
             Difficulty = request.Difficulty,
         };
 
+        await _problemRepo.AddAsync(newProblem);
+        
         await _problemRepo.AssignCategoriesToProblemAsync(newProblem.Id, request.CategoriesId);
         
-        await _problemRepo.AddAsync(newProblem);
         var problemToReturn = await _problemRepo.GetProblemByIdAsync(newProblem.Id);
         
         return problemToReturn.Adapt<ProblemResponse>();
@@ -113,7 +113,17 @@ public class ProblemService :  IProblemService
         var oldProblem = await _problemRepo.GetProblemByIdAsync(id);
         if (oldProblem == null)
         {
-            throw new ConflictException($"Problem with title:{request.Title} does not exists");
+            throw new ConflictException($"Problem with Id:{id} does not exists");
+        }
+
+        if (oldProblem.Title == request.Title)
+        {
+            throw new ConflictException($"The problem title is already set to '{request.Title}'. No update was made.");
+        }
+
+        if (!await _problemRepo.ExistsByTitleAsync(request.Title))
+        {
+            throw new ConflictException($"Problem with Title:{request.Title} already exists");
         }
 
         foreach (var categoryId in request.CategoriesId)

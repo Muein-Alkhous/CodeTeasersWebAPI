@@ -62,9 +62,13 @@ public class CategoryService : ICategoryService
     {
         var oldCategory = await _categoryRepo.GetCategoryByIdAsync(id);
         if (oldCategory is null)
-        {
             throw new NotFoundException($"Category with Id:{id} was not found");
-        }
+
+        var titleExists = await _categoryRepo.CategoryExistsByTitleAsync(title);
+        if (oldCategory.Title == title)
+            throw new ConflictException($"The category title is already set to '{title}'. No update was made.");
+        if (titleExists)
+            throw new ConflictException($"Category with title:{title} already exists");
         
         oldCategory.Title = title;
         

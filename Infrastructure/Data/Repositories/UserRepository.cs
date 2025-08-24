@@ -16,17 +16,22 @@ public class UserRepository : Repository<User>, IUserRepository
 
     public async Task<User?> GetByUsernameAsync(string username)
     {
-        return await _context
-            .Users
+        return await _context.Users
             .Include(u => u.UserStatus)
             .FirstOrDefaultAsync(u => u.Username == username);
     }
 
     public async Task<IEnumerable<User>> GetAllUsersWithStatusAsync()
     {
-        return await _context
-            .Users
+        return await _context.Users
             .Include(u => u.UserStatus)
             .ToListAsync();
+    }
+
+    public async Task<User?> GetByEmailAsync(string userEmail)
+    {
+        return await _context .Users
+            .Include(u => u.UserStatus)
+            .FirstOrDefaultAsync(u => u.Email == userEmail);
     }
 }

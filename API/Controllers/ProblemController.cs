@@ -2,10 +2,12 @@ using Application.DTOs;
 using Application.DTOs.Request;
 using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/[controller]")]
 public class ProblemController : ControllerBase
@@ -17,6 +19,7 @@ public class ProblemController : ControllerBase
         _problemService = problemService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -24,6 +27,7 @@ public class ProblemController : ControllerBase
         return Ok(problems);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
@@ -31,7 +35,7 @@ public class ProblemController : ControllerBase
         return Ok(problem);
     }
     
-    [HttpGet("{title}")]
+    [HttpGet("by-title/{title}")]
     public async Task<IActionResult> Get(string title)
     {
         var problem =  await _problemService.GetProblemByTitleAsync(title);

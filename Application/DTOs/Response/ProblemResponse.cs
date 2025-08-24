@@ -8,5 +8,5 @@ public record ProblemResponse
     string Title,
     string Difficulty,
     IEnumerable<CategoryResponse> CategoryResponses,
-    Description Description
+    DescriptionResponse Description
 );

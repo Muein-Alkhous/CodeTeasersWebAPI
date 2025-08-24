@@ -1,8 +1,10 @@
 using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoryController : ControllerBase // Not Done
@@ -25,8 +27,6 @@ public class CategoryController : ControllerBase // Not Done
     public async Task<IActionResult> GetById(Guid id)
     {
         var category = await _categoryService.GetCategoryByIdAsync(id);
-        if (category is null)
-            return NotFound();
         return Ok(category);
     }
 

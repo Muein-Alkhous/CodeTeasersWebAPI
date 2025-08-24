@@ -4,6 +4,7 @@ namespace Domain.Interfaces;
 
 public interface IProblemRepository : IRepository<Problem>
 {
+    Task<bool> ExistsByTitleAsync(string title);
     Task<List<Problem>> GetAllProblemsAsync();
     Task<Problem?> GetProblemByIdAsync(Guid id);
     Task<Problem?> GetProblemByTitleAsync(string title);

@@ -11,7 +11,6 @@ public partial class Problem : BaseEntity
 
     public virtual ICollection<ProblemCategory> ProblemCategories { get; set; } = new List<ProblemCategory>();
     
-
     public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 
     public virtual ICollection<Template> Templates { get; set; } = new List<Template>();

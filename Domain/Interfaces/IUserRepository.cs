@@ -6,5 +6,6 @@ public interface IUserRepository : IRepository<User>
 {
     Task<User?> GetByUsernameAsync(string username);
     Task<IEnumerable<User>> GetAllUsersWithStatusAsync();
-    
+
+    Task<User?> GetByEmailAsync(string userEmail);
 }

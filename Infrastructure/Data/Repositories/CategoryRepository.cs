@@ -15,7 +15,9 @@ public class CategoryRepository(AppDbContext context) : Repository<Category>(con
 
     public async Task<List<Category>> GetAllCategoriesAsync()
     {
-        return await _context.Categories.ToListAsync();
+        return await _context.Categories
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task<Category?> GetCategoryByIdAsync(Guid id)

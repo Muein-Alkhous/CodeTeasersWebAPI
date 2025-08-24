@@ -13,6 +13,11 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository
         _context = context;
     }
 
+    public async Task<bool> ExistsByTitleAsync(string title)
+    {
+        return await _context.Problems.AnyAsync(p => p.Title == title);
+    }
+
     public async Task<List<Problem>> GetAllProblemsAsync()
     {
         return await _context .Problems
@@ -106,6 +111,8 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository
         var problemCategories = newLinks.ToList();
         if (problemCategories.Count != 0)
             await _context.ProblemCategories.AddRangeAsync(problemCategories);
+        
+        await _context.SaveChangesAsync();
     }
 
     public async Task AssignTestToProblemAsync(Guid problemId, Guid testId)

@@ -17,5 +17,8 @@ public static class MappingConfig
         
         TypeAdapterConfig<Category, CategoryResponse>
             .NewConfig();
+        
+        TypeAdapterConfig<User, UserResponse>
+            .NewConfig();
     }
 }

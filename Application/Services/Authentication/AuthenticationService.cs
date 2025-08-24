@@ -1,6 +1,7 @@
 using Application.DTOs;
 using Application.DTOs.Request;
 using Application.DTOs.Response;
+using Application.Exceptions;
 using Application.Interfaces.Authentication;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -14,88 +15,68 @@ public class AuthenticationService :  IAuthenticationService
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUserRepository _userRepository;
-    private readonly IMapper _mapper;
     private readonly IPasswordHasher<User> _passwordHasher;
 
-    public AuthenticationService(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository, IMapper mapper, IPasswordHasher<User> passwordHasher)
+    public AuthenticationService(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository, IPasswordHasher<User> passwordHasher)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
-        _mapper = mapper;
         _passwordHasher = passwordHasher;
     }
 
     public async Task<AuthenticationResponse?> Register(RegisterRequest registerRequest)
     {
-        // 1. Validate if the user doesn't exist
-        var userExist = await _userRepository.GetByUsernameAsync(registerRequest.Username);
-        if (userExist != null)
-        {
-            return null;
-        }
-        
-        // Hashing the password
-        
-        // 2. Create user (generate unique ID)
+        // Check username or email conflict
+        var existingByUsername = await _userRepository.GetByUsernameAsync(registerRequest.Username);
+        var existingByEmail = await _userRepository.GetByEmailAsync(registerRequest.Email);
+        if (existingByUsername is not null || existingByEmail is not null)
+            throw new ConflictException($"User with the same username or email already exists.");
+
         var user = new User
         {
             Username = registerRequest.Username,
             Email = registerRequest.Email,
         };
-        
-        // Hashing password
-        var hashedPassword = HashPassword(user, registerRequest.Password);
-        user.Password = hashedPassword;
 
-        // Adding status to user
-        var userStatus = new UserStatus();
-        user.UserStatus = userStatus;
-        
+        user.Password = HashPassword(user, registerRequest.Password);
+
+        // Optionally initialize status/rank etc.
+        user.UserStatus = new UserStatus
+        {
+            Rank = "Newbie"
+        };
+
         await _userRepository.AddAsync(user);
 
-        var userResponse = _mapper.Map<UserResponse>(user);
-        
-        // 3. Create JWT Token
-        var token = _jwtTokenGenerator.GenerateToken(user);
-        
-        return new AuthenticationResponse(userResponse, token);
+        var userResponse = user.Adapt<UserResponse>();
+        var token = _jwtTokenGenerator.Generate(user);
+
+        return new AuthenticationResponse(userResponse, token.AccessToken, token.RefreshToken);
     }
     
     public async Task<AuthenticationResponse?> Login(LoginRequest loginRequest)
     {
         
         var user = await _userRepository.GetByUsernameAsync(loginRequest.Username);
-        
-        if (user == null)
-        {
-            return null; // User doesn't exist
-        }
+        // Always return Unauthorized on bad credentials (don’t reveal which part failed)
+        if (user is null || !VerifyPassword(user, loginRequest.Password, user.Password))
+            throw new UnauthorizedAccessException("Invalid username or password.");
 
-        var result = VerifyPassword(user, user.Password, loginRequest.Password);
-        if (result)
-        {
-            return null;
-        }
-        
-        var userResponse = _mapper.Map<UserResponse>(user);
-        
-        var token = _jwtTokenGenerator.GenerateToken(user);
-        
-        return new AuthenticationResponse(userResponse, token);
+        var userResponse = user.Adapt<UserResponse>();
+        var token = _jwtTokenGenerator.Generate(user);
+
+        return new AuthenticationResponse(userResponse, token.AccessToken, token.RefreshToken);
     }
 
     
     
-    // Helper Functions
-    private string HashPassword(User user, string password)
-    {
-        return _passwordHasher.HashPassword(user, password);
-    }
+    // Helpers
+    private string HashPassword(User user, string password) =>
+        _passwordHasher.HashPassword(user, password);
 
-    private bool VerifyPassword(User user, string password, string hashedPassword)
-    {
-        var result = _passwordHasher.VerifyHashedPassword(user, hashedPassword, password);
-        return result == PasswordVerificationResult.Success;
-    }
+    // providedPassword vs hashedPassword (order matters)
+    private bool VerifyPassword(User user, string providedPassword, string hashedPassword) =>
+        _passwordHasher.VerifyHashedPassword(user, hashedPassword, providedPassword)
+        == PasswordVerificationResult.Success;
 
 }

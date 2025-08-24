@@ -22,26 +22,36 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _jwtSettings = jwtOptions.Value;
     }
 
-    public string GenerateToken(User user)
+    public JwtResult Generate(User user)
     {
-        var signingCridentials = new SigningCredentials(
-            new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
-            SecurityAlgorithms.HmacSha256);
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
-        };
-        
-        var securityToken = new JwtSecurityToken(
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        // Access token
+        var accessTokenExpiration = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes);
+        var accessToken = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
-            expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-            claims: claims, 
-            signingCredentials: signingCridentials);
-        
-        return new JwtSecurityTokenHandler().WriteToken(securityToken); 
+            claims: new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+            },
+            expires: accessTokenExpiration,
+            signingCredentials: creds
+        );
+
+        // Refresh token (GUID, random string etc.)
+        var refreshToken = Guid.NewGuid().ToString();
+        var refreshTokenExpiration = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays);
+
+        return new JwtResult
+        {
+            AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+            RefreshToken = refreshToken,
+            AccessTokenExpiresAt = accessTokenExpiration,
+            RefreshTokenExpiresAt = refreshTokenExpiration
+        };
     }
 }
