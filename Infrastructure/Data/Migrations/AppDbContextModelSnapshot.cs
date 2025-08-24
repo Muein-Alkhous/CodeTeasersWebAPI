@@ -55,16 +55,16 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<string>("DescriptionPath")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description_path");
 
                     b.HasKey("Id")
                         .HasName("descriptions_pkey");
@@ -332,13 +332,13 @@ namespace Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.Description", b =>
                 {
-                    b.HasOne("Domain.Entities.Problem", "IdNavigation")
+                    b.HasOne("Domain.Entities.Problem", "Problem")
                         .WithOne("Description")
                         .HasForeignKey("Domain.Entities.Description", "Id")
                         .IsRequired()
                         .HasConstraintName("descriptions_id_fkey");
 
-                    b.Navigation("IdNavigation");
+                    b.Navigation("Problem");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProblemCategory", b =>

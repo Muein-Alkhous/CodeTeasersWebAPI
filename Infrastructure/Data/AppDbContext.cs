@@ -70,14 +70,15 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
-            entity.Property(e => e.DescriptionPath)
-                .HasColumnName("description_path");
+            entity.Property(e => e.Content)
+                .HasColumnType("text")
+                .HasColumnName("content");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
 
-            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Description)
+            entity.HasOne(d => d.Problem).WithOne(p => p.Description)
                 .HasForeignKey<Description>(d => d.Id)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("descriptions_id_fkey");

@@ -23,9 +23,11 @@ public class ProblemService :  IProblemService
         _categoryRepo = categoryRepo;
     }
 
-    public async Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync()
+    public async Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync(
+        string? difficulty = null, 
+        Guid? categoryId = null)
     {
-        var problems = await _problemRepo.GetAllProblemsAsync();
+        var problems = await _problemRepo.GetAllProblemsAsync(difficulty, categoryId);
         return problems.Adapt<IEnumerable<ProblemResponse>>();
     }
 
@@ -82,7 +84,7 @@ public class ProblemService :  IProblemService
     public async Task<ProblemResponse?> CreateProblemAsync(ProblemRequest request)
     {
        
-        if (!await _problemRepo.ExistsByTitleAsync(request.Title))
+        if (await _problemRepo.ExistsByTitleAsync(request.Title))
         {
             throw new ConflictException($"Problem with title:{request.Title} already exists");
         }

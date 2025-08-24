@@ -2,6 +2,6 @@
 
 public partial class Description : BaseEntity
 {
-    public string DescriptionPath { get; set; } = null!;
-    public virtual Problem IdNavigation { get; set; } = null!;
+    public string Content { get; set; } = null!;
+    public virtual Problem Problem { get; set; } = null!;
 }

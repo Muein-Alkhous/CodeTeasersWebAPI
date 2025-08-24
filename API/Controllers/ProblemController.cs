@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProblemController : ControllerBase
@@ -21,9 +21,11 @@ public class ProblemController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllProblems(
+        [FromQuery] string? difficulty, 
+        [FromQuery] Guid? categoryId)
     {
-        var problems = await _problemService.GetAllProblemsAsync();
+        var problems = await _problemService.GetAllProblemsAsync(difficulty, categoryId);
         return Ok(problems);
     }
 

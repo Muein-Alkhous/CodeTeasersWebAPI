@@ -7,7 +7,7 @@ namespace Application.Interfaces;
 
 public interface IProblemService
 {
-    Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync();
+    Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync(string? difficulty = null, Guid? categoryId = null);
     Task<ProblemResponse?> GetProblemByIdAsync(Guid id);
     Task<ProblemResponse?> GetProblemByTitleAsync(string title);
     Task<IEnumerable<ProblemResponse>> GetProblemsByDifficultyAsync(string difficulty);
