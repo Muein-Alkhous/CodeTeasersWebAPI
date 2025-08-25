@@ -4,26 +4,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Repositories;
 
-public class ProblemRepository(AppDbContext context) : Repository<Problem>(context), IProblemRepository
+public class ProblemRepository : Repository<Problem>, IProblemRepository
 {
-    private readonly AppDbContext _context = context;
+    private readonly AppDbContext _context;
+
+    public ProblemRepository(AppDbContext context) : base(context)
+    {
+        _context = context;
+    }
 
     public async Task<bool> ExistsByTitleAsync(string title)
     {
         return await _context.Problems.AnyAsync(p => p.Title == title);
     }
 
-    public async Task<IEnumerable<Problem>> GetAllProblemsAsync(string? difficulty, Guid? categoryId)
+    public async Task<List<Problem>> GetAllProblemsAsync()
     {
-        var query = _context.Problems.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(difficulty))
-            query = query.Where(p => p.Difficulty == difficulty);
-
-        if (categoryId.HasValue)
-            query = query.Where(p => p.ProblemCategories.Any(pc => pc.CategoryId == categoryId.Value));
-
-        return await query.Include(p => p.ProblemCategories)
+        return await _context .Problems
+            .Include(p => p.ProblemCategories)
             .ThenInclude(pc => pc.Category)
             .ToListAsync();
     }

@@ -14,6 +14,7 @@ public class ProblemController : ControllerBase
 {
     private readonly IProblemService _problemService;
 
+
     public ProblemController(IProblemService problemService)
     {
         _problemService = problemService;
@@ -21,11 +22,9 @@ public class ProblemController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> GetAllProblems(
-        [FromQuery] string? difficulty, 
-        [FromQuery] Guid? categoryId)
+    public async Task<IActionResult> GetAll()
     {
-        var problems = await _problemService.GetAllProblemsAsync(difficulty, categoryId);
+        var problems = await _problemService.GetAllProblemsAsync();
         return Ok(problems);
     }
 
@@ -63,6 +62,21 @@ public class ProblemController : ControllerBase
     {
         await _problemService.DeleteProblemAsync(id);
         return NoContent();
+    }
+
+    [HttpGet("{problemId:guid}/description")]
+    public async Task<IActionResult> DownloadDescription(Guid problemId)
+    {
+        var descriptionContent = await _problemService.GetDescriptionByIdAsync(problemId);
+        var fileContentResult = new FileContentResult(descriptionContent.Data, "text/makdown");
+        return Ok(fileContentResult);
+    }
+    
+    [HttpPost("{problemId:guid}/description")]
+    public async Task<IActionResult> UploadDescription(Guid problemId, IFormFile file)
+    {
+        var description = await _problemService.AddOrUpdateDescriptionAsync(problemId, file);
+        return Ok(description);
     }
     
 }

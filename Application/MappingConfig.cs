@@ -11,17 +11,11 @@ public static class MappingConfig
     {
         TypeAdapterConfig<Problem, ProblemResponse>
             .NewConfig()
-            .Map(dest => dest.CategoryResponses,
-                src => src.ProblemCategories
+            .Map(dest => dest.CategoryResponses, src => src.ProblemCategories
                 .Select(pc => pc.Category)
-                .Adapt<IEnumerable<CategoryResponse>>())
-            .Map(dest => dest.Description,
-                src => src.Description.Adapt<DescriptionResponse>());
+                .Adapt<IEnumerable<CategoryResponse>>());
         
         TypeAdapterConfig<Category, CategoryResponse>
-            .NewConfig();
-
-        TypeAdapterConfig<Description, DescriptionResponse>
             .NewConfig();
         
         TypeAdapterConfig<User, UserResponse>

@@ -6,7 +6,7 @@ using Application.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
 using Mapster;
-using MapsterMapper;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Services;
 
@@ -15,19 +15,18 @@ public class ProblemService :  IProblemService
     
     private readonly IProblemRepository _problemRepo;
     private readonly ICategoryRepository _categoryRepo;
+    private readonly IDescriptionRepository _descriptionRepo;
 
-
-    public ProblemService(IProblemRepository problemRepo, ICategoryRepository categoryRepo)
+    public ProblemService(IProblemRepository problemRepo, ICategoryRepository categoryRepo, IDescriptionRepository descriptionRepo)
     {
         _problemRepo = problemRepo;
         _categoryRepo = categoryRepo;
+        _descriptionRepo = descriptionRepo;
     }
 
-    public async Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync(
-        string? difficulty = null, 
-        Guid? categoryId = null)
+    public async Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync()
     {
-        var problems = await _problemRepo.GetAllProblemsAsync(difficulty, categoryId);
+        var problems = await _problemRepo.GetAllProblemsAsync();
         return problems.Adapt<IEnumerable<ProblemResponse>>();
     }
 
@@ -84,7 +83,7 @@ public class ProblemService :  IProblemService
     public async Task<ProblemResponse?> CreateProblemAsync(ProblemRequest request)
     {
        
-        if (await _problemRepo.ExistsByTitleAsync(request.Title))
+        if (!await _problemRepo.ExistsByTitleAsync(request.Title))
         {
             throw new ConflictException($"Problem with title:{request.Title} already exists");
         }
@@ -156,6 +155,14 @@ public class ProblemService :  IProblemService
         return true;
     }
 
+    public async Task<DescriptionResponse?> GetDescriptionByIdAsync(Guid problemId)
+    {
+        var description = await _descriptionRepo.GetDescriptionByProblemIdAsync(problemId);
+        if (description is null)
+            throw new NotFoundException($"Description with Id:{problemId} does not exist");
+        return description.Adapt<DescriptionResponse>();
+    }
+
     public async Task<bool> AssignCategoriesToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds)
     {
         var problem = await _problemRepo.GetProblemByIdAsync(problemId);
@@ -166,6 +173,25 @@ public class ProblemService :  IProblemService
     }
 
 
+    public async Task<DescriptionResponse> AddOrUpdateDescriptionAsync(Guid problemId, IFormFile file)
+    {
+        var problem = await _problemRepo.GetProblemByIdAsync(problemId);
+        if (problem is null)
+            throw new NotFoundException($"Problem with Id:{problemId} does not exist");
+        if (file == null || file.Length == 0)
+            throw new Exception("No file uploaded.");
+        
+        var description = new Description();
+        description.Id = problemId;
+        using (var memoryStream = new MemoryStream())
+        {
+            await file.CopyToAsync(memoryStream);
+            description.Data = memoryStream.ToArray();
+        }
+        await _descriptionRepo.AddAsync(description);
+        return description.Adapt<DescriptionResponse>();
+        
+    }
 
     public async Task<bool> AssignTestToProblemAsync(Guid problemId, Guid testId)
     {

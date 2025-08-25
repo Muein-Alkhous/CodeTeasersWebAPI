@@ -1,5 +1,6 @@
 using System.Text;
 using API.ExceptionHandlers;
+using API.Filters;
 using Application;
 using Infrastructure;
 using Infrastructure.Authentication;
@@ -75,6 +76,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
+            c.OperationFilter<FileUploadOperationFilter>();
             c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "CodeTeasers API",

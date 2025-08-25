@@ -4,16 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Repositories;
 
-public class DescriptionRepository(AppDbContext context) : Repository<Description>(context), IDescriptionRepository
+public class DescriptionRepository : Repository<Description>, IDescriptionRepository
 {
-    private readonly AppDbContext _context = context;
-    
+    private readonly AppDbContext _context;
+
+    public DescriptionRepository(AppDbContext context) : base(context)
+    {
+        _context = context;
+    }
+
     public async Task<Description?> GetDescriptionByProblemIdAsync(Guid problemId)
     {
         return await _context.Descriptions
-            .Include(d => d.Problem) // Problem navigation property
             .FirstOrDefaultAsync(d => d.Id == problemId);
     }
-    
-    
 }

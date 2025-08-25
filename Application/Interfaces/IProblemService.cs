@@ -1,13 +1,12 @@
-using Application.DTOs;
 using Application.DTOs.Request;
 using Application.DTOs.Response;
-using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Interfaces;
 
 public interface IProblemService
 {
-    Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync(string? difficulty = null, Guid? categoryId = null);
+    Task<IEnumerable<ProblemResponse>> GetAllProblemsAsync();
     Task<ProblemResponse?> GetProblemByIdAsync(Guid id);
     Task<ProblemResponse?> GetProblemByTitleAsync(string title);
     Task<IEnumerable<ProblemResponse>> GetProblemsByDifficultyAsync(string difficulty);
@@ -19,9 +18,11 @@ public interface IProblemService
     Task<ProblemResponse?> CreateProblemAsync(ProblemRequest request);
     Task<ProblemResponse?> UpdateProblemAsync(Guid id, ProblemRequest request);
     Task<bool> DeleteProblemAsync(Guid id);
+    Task<DescriptionResponse> AddOrUpdateDescriptionAsync(Guid problemId, IFormFile file);
+    Task <DescriptionResponse?> GetDescriptionByIdAsync(Guid problemId);
     
     Task<bool> AssignCategoriesToProblemAsync(Guid problemId, IEnumerable<Guid> categoryIds);
-    
+
     Task<bool> AssignTestToProblemAsync(Guid problemId, Guid testId);
     Task<bool> UnAssignTestFromProblemAsync(Guid problemId, Guid testId);
     
